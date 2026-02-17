@@ -33,3 +33,7 @@ swift build -c release
 .build/release/mem --json --top 50
 .build/release/mem --include-others --verbose
 ```
+
+## Screenshot
+
+![mem output screenshot](Docs/screenshot.png)
