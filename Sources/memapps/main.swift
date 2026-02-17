@@ -175,6 +175,8 @@ private struct AppIdentity {
 private struct ProcessScanner {
     private let includeOthers: Bool
     private var identityCache: [pid_t: AppIdentity?] = [:]
+    private var parentCache: [pid_t: pid_t?] = [:]
+    private var pathCache: [pid_t: String?] = [:]
 
     init(includeOthers: Bool) {
         self.includeOthers = includeOthers
@@ -224,23 +226,108 @@ private struct ProcessScanner {
 
         let resolved: AppIdentity?
 
-        if let app = NSRunningApplication(processIdentifier: pid),
-           let bundleId = app.bundleIdentifier
-        {
-            let displayName = app.localizedName ?? bundleId
-            resolved = AppIdentity(groupKey: "bundle:\(bundleId)", name: displayName, bundleId: bundleId)
+        if let appIdentity = bundleIdentity(for: pid) {
+            resolved = appIdentity
         } else if includeOthers {
-            if let path = executablePath(for: pid), !path.isEmpty {
-                let name = URL(fileURLWithPath: path).lastPathComponent
-                resolved = AppIdentity(groupKey: "path:\(path)", name: name, bundleId: nil)
-            } else {
-                resolved = AppIdentity(groupKey: "other", name: "Other", bundleId: nil)
-            }
+            resolved = lineageIdentity(for: pid)
         } else {
             resolved = nil
         }
 
         identityCache[pid] = resolved
+        return resolved
+    }
+
+    private func bundleIdentity(for pid: pid_t) -> AppIdentity? {
+        guard let app = NSRunningApplication(processIdentifier: pid),
+              let bundleId = app.bundleIdentifier
+        else {
+            return nil
+        }
+
+        let displayName = app.localizedName ?? bundleId
+        return AppIdentity(groupKey: "bundle:\(bundleId)", name: displayName, bundleId: bundleId)
+    }
+
+    private mutating func lineageIdentity(for pid: pid_t) -> AppIdentity {
+        let lineage = processLineage(from: pid, maxDepth: 48)
+
+        for ancestor in lineage {
+            if let appIdentity = bundleIdentity(for: ancestor) {
+                return appIdentity
+            }
+        }
+
+        if let rootPID = lineage.last {
+            if let rootPath = executablePathCached(for: rootPID), !rootPath.isEmpty {
+                let rootName = URL(fileURLWithPath: rootPath).lastPathComponent
+                return AppIdentity(groupKey: "tree:\(rootPath)", name: rootName, bundleId: nil)
+            }
+        }
+
+        if let ownPath = executablePathCached(for: pid), !ownPath.isEmpty {
+            let ownName = URL(fileURLWithPath: ownPath).lastPathComponent
+            return AppIdentity(groupKey: "path:\(ownPath)", name: ownName, bundleId: nil)
+        }
+
+        return AppIdentity(groupKey: "other", name: "Other", bundleId: nil)
+    }
+
+    private mutating func processLineage(from pid: pid_t, maxDepth: Int) -> [pid_t] {
+        var lineage: [pid_t] = []
+        var seen: Set<pid_t> = []
+        var current = pid
+
+        for _ in 0 ..< maxDepth {
+            guard current > 0, !seen.contains(current) else {
+                break
+            }
+
+            lineage.append(current)
+            seen.insert(current)
+
+            guard let parent = parentPID(for: current), parent > 1 else {
+                break
+            }
+
+            current = parent
+        }
+
+        return lineage
+    }
+
+    private mutating func parentPID(for pid: pid_t) -> pid_t? {
+        if let cached = parentCache[pid] {
+            return cached
+        }
+
+        var info = proc_bsdinfo()
+        let size = proc_pidinfo(
+            pid,
+            PROC_PIDTBSDINFO,
+            0,
+            &info,
+            Int32(MemoryLayout<proc_bsdinfo>.stride)
+        )
+
+        let resolved: pid_t?
+        if size == MemoryLayout<proc_bsdinfo>.stride {
+            resolved = pid_t(info.pbi_ppid)
+        } else {
+            resolved = nil
+        }
+
+        parentCache[pid] = resolved
+        return resolved
+    }
+
+    private mutating func executablePathCached(for pid: pid_t) -> String? {
+        if let cached = pathCache[pid] {
+            return cached
+        }
+
+        let resolved = executablePath(for: pid)
+        pathCache[pid] = resolved
         return resolved
     }
 }
