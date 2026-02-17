@@ -4,6 +4,13 @@ Tiny macOS Swift CLI that prints an application memory overview similar to the m
 
 It scans running PIDs with `libproc`, reads `ri_phys_footprint` via `proc_pid_rusage`, groups by app bundle identifier where possible, and sums memory across each app's processes.
 
+## Installation
+
+```bash
+brew tap bohdanlevchenko/tap
+brew install mem
+```
+
 ## Build
 
 ```bash
