@@ -33,4 +33,24 @@ final class AppAggregatorTests: XCTestCase {
         XCTAssertEqual(MemoryUnits.megabytesToBytes(1), 1_048_576)
         XCTAssertEqual(MemoryUnits.megabytesToBytes(0), 0)
     }
+
+    func testCanonicalizeBundleIdentityMapsFirefoxPluginContainer() {
+        let result = BundleIdentityNormalization.canonicalize(
+            bundleId: "org.mozilla.plugincontainer",
+            name: "FirefoxCP Web Content"
+        )
+
+        XCTAssertEqual(result.bundleId, "org.mozilla.firefox")
+        XCTAssertEqual(result.name, "Firefox")
+    }
+
+    func testCanonicalizeBundleIdentityPreservesOtherApps() {
+        let result = BundleIdentityNormalization.canonicalize(
+            bundleId: "com.apple.Terminal",
+            name: "Terminal"
+        )
+
+        XCTAssertEqual(result.bundleId, "com.apple.Terminal")
+        XCTAssertEqual(result.name, "Terminal")
+    }
 }

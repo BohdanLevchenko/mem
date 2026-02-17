@@ -246,7 +246,8 @@ private struct ProcessScanner {
         }
 
         let displayName = app.localizedName ?? bundleId
-        return AppIdentity(groupKey: "bundle:\(bundleId)", name: displayName, bundleId: bundleId)
+        let canonical = BundleIdentityNormalization.canonicalize(bundleId: bundleId, name: displayName)
+        return AppIdentity(groupKey: "bundle:\(canonical.bundleId)", name: canonical.name, bundleId: canonical.bundleId)
     }
 
     private mutating func lineageIdentity(for pid: pid_t) -> AppIdentity {
