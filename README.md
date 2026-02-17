@@ -7,6 +7,12 @@ It scans running PIDs with `libproc`, reads `ri_phys_footprint` via `proc_pid_ru
 ## Installation
 
 ```bash
+brew install bohdanlevchenko/tap/mem
+```
+
+Or step by step
+
+```bash
 brew tap bohdanlevchenko/tap
 brew install mem
 ```
