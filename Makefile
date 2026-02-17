@@ -34,10 +34,10 @@ test: dirs
 	$(SWIFT_ENV) $(SWIFT) test $(BUILD_FLAGS)
 
 run: release
-	./.build/release/memapps --top $(TOP) $(ARGS)
+	./.build/release/mem --top $(TOP) $(ARGS)
 
 run-json: release
-	./.build/release/memapps --top $(TOP) --json $(ARGS)
+	./.build/release/mem --top $(TOP) --json $(ARGS)
 
 clean:
 	rm -rf .build

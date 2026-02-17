@@ -2,29 +2,29 @@
 import PackageDescription
 
 let package = Package(
-    name: "mem-usage",
+    name: "mem",
     platforms: [
         .macOS(.v12)
     ],
     products: [
-        .library(name: "MemAppsCore", targets: ["MemAppsCore"]),
-        .executable(name: "memapps", targets: ["memapps"])
+        .library(name: "MemCore", targets: ["MemCore"]),
+        .executable(name: "mem", targets: ["mem"])
     ],
     dependencies: [],
     targets: [
         .target(
-            name: "MemAppsCore",
-            path: "Sources/MemAppsCore"
+            name: "MemCore",
+            path: "Sources/MemCore"
         ),
         .executableTarget(
-            name: "memapps",
-            dependencies: ["MemAppsCore"],
-            path: "Sources/memapps"
+            name: "mem",
+            dependencies: ["MemCore"],
+            path: "Sources/mem"
         ),
         .testTarget(
-            name: "MemAppsCoreTests",
-            dependencies: ["MemAppsCore"],
-            path: "Tests/MemAppsCoreTests"
+            name: "MemTests",
+            dependencies: ["MemCore"],
+            path: "Tests/MemTests"
         )
     ]
 )

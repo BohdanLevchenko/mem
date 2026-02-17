@@ -1,10 +1,10 @@
 import AppKit
 import Darwin
 import Foundation
-import MemAppsCore
+import MemCore
 
 @main
-struct MemAppsCLI {
+struct MemCLI {
     static func main() {
         do {
             let parseResult = try CLIOptions.parse(arguments: Array(CommandLine.arguments.dropFirst()))
@@ -56,10 +56,10 @@ private struct CLIOptions {
     var verbose = false
 
     static let helpText = """
-    memapps - Print an application memory overview grouped by app
+    mem - Print an application memory overview grouped by app
 
     Usage:
-      memapps [--top N] [--json] [--bytes] [--include-others] [--min MB] [--verbose]
+      mem [--top N] [--json] [--bytes] [--include-others] [--min MB] [--verbose]
 
     Options:
       --top N            Show only top N entries (default: 30)

@@ -1,4 +1,4 @@
-# memapps
+# mem
 
 Tiny macOS Swift CLI that prints an application memory overview similar to the macOS "application memory" warning dialog, grouped by app.
 
@@ -13,7 +13,7 @@ swift build -c release
 ## Run
 
 ```bash
-.build/release/memapps --top 20
+.build/release/mem --top 20
 ```
 
 ## Flags
@@ -28,8 +28,8 @@ swift build -c release
 ## Examples
 
 ```bash
-.build/release/memapps --top 30
-.build/release/memapps --top 20 --min 200
-.build/release/memapps --json --top 50
-.build/release/memapps --include-others --verbose
+.build/release/mem --top 30
+.build/release/mem --top 20 --min 200
+.build/release/mem --json --top 50
+.build/release/mem --include-others --verbose
 ```

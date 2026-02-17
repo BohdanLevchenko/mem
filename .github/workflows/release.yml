@@ -35,7 +35,7 @@ jobs:
         run: |
           set -euo pipefail
           arch="$(uname -m)"
-          artifact_name="memapps-${{ matrix.os }}-${arch}"
+          artifact_name="mem-${{ matrix.os }}-${arch}"
           echo "arch=${arch}" >> "$GITHUB_OUTPUT"
           echo "artifact_name=${artifact_name}" >> "$GITHUB_OUTPUT"
 
@@ -48,11 +48,11 @@ jobs:
           set -euo pipefail
           mkdir -p dist
           artifact_name="${{ steps.meta.outputs.artifact_name }}"
-          cp .build/release/memapps "dist/memapps"
-          chmod +x "dist/memapps"
-          tar -C dist -czf "dist/${artifact_name}.tar.gz" memapps
+          cp .build/release/mem "dist/mem"
+          chmod +x "dist/mem"
+          tar -C dist -czf "dist/${artifact_name}.tar.gz" mem
           shasum -a 256 "dist/${artifact_name}.tar.gz" > "dist/${artifact_name}.sha256"
-          rm -f "dist/memapps"
+          rm -f "dist/mem"
 
       - name: Upload Build Artifact
         uses: actions/upload-artifact@v4

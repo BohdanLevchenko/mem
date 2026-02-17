@@ -1,4 +1,4 @@
-import MemAppsCore
+import MemCore
 import XCTest
 
 final class AppAggregatorTests: XCTestCase {
